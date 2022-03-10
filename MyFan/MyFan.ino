@@ -37,6 +37,9 @@ void setup() {
   server.on("/fan", fanControl);
   server.on("/temperature", sendTemperature);
   server.onNotFound(handleTheClient);
+
+  // 默认自动模式
+  T.attach(1000, control_temperature);
 }
 
 void loop() {
@@ -80,15 +83,14 @@ void fanControl() {
 void control_temperature() {
   if (temperature.toDouble() > 30.0) {
     digitalWrite(FAN, 0);
+    Serial.println("open");
   } else {
     digitalWrite(FAN, 1);
+    Serial.println("close");
   }
 }
 
 void handleTheClient() {
-
-
-
   // 获取用户请求网址信息
   String webAddress = server.uri();
 
@@ -117,7 +119,6 @@ void wifi() {
 }
 
 bool handleFileRead(String path) {            //处理浏览器HTTP访问
-
   if (path.endsWith("/")) {                   // 如果访问地址以"/"为结尾
     path = "/fan.html";                     // 则将访问地址修改为/index.html便于SPIFFS访问
   }
