@@ -2,42 +2,77 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" type="text/css" href="main.css">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 
 <body>
-	<center>
-	  <div>
-		当前温度： <span id="Temperature">NA</span><br>
-	  </div>
-      <form action="fan" method="post">
-        <input class="button" type="submit" value="open" name="status">
-		
-        <input class="button" type="submit" value="close" name="status">
+    <div class="button_div">
+        <center>
+            <div>
+                <h1> 当前温度： <span id="Temperature">正在读取</span></h1>
+            </div>
+            <div>
+                <h1>当前模式： <span id="Condition">正在读取</span></h1>
+            </div>
+            <div>
+                <h1>最大温度： <span id="Temperature_MAX">正在读取</span></h1>
+            </div>
+            <div>
+                <form action="fan" method="post">
+                    <h1> <span class="mytxt">设定最大温度：</span>
+                        <input type="text" value="" name="max_t"> </h1>
+                    </br>
+                    <input class="button" type="submit" value="open" name="status">
+                    <input class="button" type="submit" value="close" name="status">
+                    <input class="button" type="submit" value="auto" name="status">
+                </form>
+            </div>
+            <script>
+                setInterval(function() {
+                    // Call a function repetatively with 1 Second interval
+                    getData();
+                    getCondition();
+                    getTemperature_MAX();
+                }, 1000); //1000mSeconds update rate
 
-        <input class="button" type="submit" value="auto" name="status">
-      </form>
-	  <script>
+                function getData() {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("Temperature").innerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open("GET", "temperature", true);
+                    xhttp.send();
 
-setInterval(function() {
-  // Call a function repetatively with 2 Second interval
-  getData();
-}, 2000); //2000mSeconds update rate
- 
-function getData() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("Temperature").innerHTML =
-      this.responseText;
-    }
-  };
-  xhttp.open("GET", "temperature", true);
-  xhttp.send();
-}
-</script>
-	</center>
+                }
+
+                function getCondition() {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("Condition").innerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open("GET", "Condition", true);
+                    xhttp.send();
+                }
+
+
+                function getTemperature_MAX() {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("Temperature_MAX").innerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open("GET", "Temperature_MAX", true);
+                    xhttp.send();
+                }
+            </script>
+        </center>
+    </div>
 </body>
 
 </html>

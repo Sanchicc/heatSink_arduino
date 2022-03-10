@@ -15,6 +15,8 @@ int fanStatus;
 OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
 String temperature;
+String Condition = "自动";
+double max_t = 30.0;
 
 void setup() {
   Serial.begin(115200);
@@ -36,6 +38,8 @@ void setup() {
   server.begin();
   server.on("/fan", fanControl);
   server.on("/temperature", sendTemperature);
+  server.on("/Condition", sendCondition);
+  server.on("/Temperature_MAX", sendTemperature_MAX);
   server.onNotFound(handleTheClient);
 
   // 默认自动模式
@@ -58,21 +62,40 @@ void sendTemperature() {
   server.send(200, "text/plain", temperature);
 }
 
+void sendCondition() {
+  server.send(200, "text/plain", Condition);
+}
+
+void sendTemperature_MAX(){
+  server.send(200, "text/plain", String(max_t));
+}
+
 void detect() {
   fanStatus = digitalRead(FAN);
 }
 
 void fanControl() {
   String status = server.arg("status");
+  double tmp = server.arg("max_t").toDouble();
+  
+  if(tmp != 0.00){
+    max_t = tmp;
+  }
+  
+  Serial.println("最大温度：" + String(max_t));
+  
   if (status == "open") {
     T.detach();
     digitalWrite(FAN, 0);
+    Condition = "常开";
   }
   else if (status == "close") {
     T.detach();
     digitalWrite(FAN, 1);
+    Condition = "关闭";
   } else if (status == "auto") {
     T.attach(1000, control_temperature);
+    Condition = "自动";
   }
   Serial.println("FAN: " + String(status));
 
@@ -81,7 +104,7 @@ void fanControl() {
 }
 
 void control_temperature() {
-  if (temperature.toDouble() > 30.0) {
+  if (temperature.toDouble() > max_t) {
     digitalWrite(FAN, 0);
     Serial.println("open");
   } else {
