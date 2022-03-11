@@ -16,7 +16,7 @@ OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
 String temperature;
 String Condition = "自动";
-double max_t = 30.0;
+double max_t = 40.0;
 
 void setup() {
   Serial.begin(115200);
@@ -41,6 +41,7 @@ void setup() {
 
   server.begin();
   server.on("/fan", fanControl);
+  server.on("/fanStatus", sendfanStatus);
   server.on("/temperature", sendTemperature);
   server.on("/Condition", sendCondition);
   server.on("/Temperature_MAX", sendTemperature_MAX);
@@ -69,6 +70,10 @@ void sendCondition() {
 
 void sendTemperature_MAX(){
   server.send(200, "text/plain", String(max_t));
+}
+
+void sendfanStatus(){
+  server.send(200, "text/plain", digitalRead(FAN)?"关闭":"开启");    
 }
 
 void detect() {

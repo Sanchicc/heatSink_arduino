@@ -16,6 +16,9 @@
                 <h1>当前模式： <span id="Condition">正在读取</span></h1>
             </div>
             <div>
+                <h1>当前状态： <span id="fanStatus">正在读取</span></h1>
+            </div>
+            <div>
                 <h1>最大温度： <span id="Temperature_MAX">正在读取</span></h1>
             </div>
             <div>
@@ -34,6 +37,7 @@
                     getData();
                     getCondition();
                     getTemperature_MAX();
+                    getfanStatus();
                 }, 1000); //1000mSeconds update rate
 
                 function getData() {
@@ -68,6 +72,17 @@
                         }
                     };
                     xhttp.open("GET", "Temperature_MAX", true);
+                    xhttp.send();
+                }
+
+                function getfanStatus() {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            document.getElementById("fanStatus").innerHTML = this.responseText;
+                        }
+                    };
+                    xhttp.open("GET", "fanStatus", true);
                     xhttp.send();
                 }
             </script>
