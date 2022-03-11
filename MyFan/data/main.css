@@ -13,7 +13,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: transparent url(background.jpg) center center no-repeat;
+    background: transparent url(bg.jpg) center center no-repeat;
     filter: blur(10px);
     z-index: -1;
     background-size: cover;

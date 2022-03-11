@@ -10,7 +10,7 @@
 WiFiClient client;
 ESP8266WebServer server(80);
 Ticker ticker;
-Ticker T;
+Ticker ticker2;
 int fanStatus;
 OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
@@ -21,11 +21,15 @@ double max_t = 30.0;
 void setup() {
   Serial.begin(115200);
   wifi();
-  ticker.attach(500, detect);
-
+  
   pinMode(FAN, OUTPUT);
   pinMode(A0, OUTPUT);
   digitalWrite(FAN, LOW);
+
+  ticker.attach_ms(500, detect);
+  
+  // 默认自动模式
+  ticker2.attach(1, control_temperature);
 
   sensors.begin();
 
@@ -41,9 +45,6 @@ void setup() {
   server.on("/Condition", sendCondition);
   server.on("/Temperature_MAX", sendTemperature_MAX);
   server.onNotFound(handleTheClient);
-
-  // 默认自动模式
-  T.attach(1000, control_temperature);
 }
 
 void loop() {
@@ -85,16 +86,17 @@ void fanControl() {
   Serial.println("最大温度：" + String(max_t));
   
   if (status == "open") {
-    T.detach();
+    ticker2.detach();
     digitalWrite(FAN, 0);
     Condition = "常开";
   }
   else if (status == "close") {
-    T.detach();
+    ticker2.detach();
     digitalWrite(FAN, 1);
     Condition = "关闭";
   } else if (status == "auto") {
-    T.attach(1000, control_temperature);
+    ticker2.detach();
+    ticker2.attach(1, control_temperature);
     Condition = "自动";
   }
   Serial.println("FAN: " + String(status));
