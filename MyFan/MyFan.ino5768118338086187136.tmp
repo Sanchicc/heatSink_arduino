@@ -55,9 +55,8 @@ void setup() {
 void loop() {
   server.handleClient();
 
-  static int i = 0;
-  i++;
-  if (i == 100) {
+  static int i++ = 0;
+  if (i == 10) {
     DHT.read(DHT11_PIN);
     sensors.requestTemperatures();
 
