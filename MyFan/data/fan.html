@@ -11,21 +11,29 @@
 <body>
 <div class="button_div">
     <center>
-        <h1>当前温度： <span id="Temperature">正在读取</span></h1>
-        <h1>当前湿度： <span id="Humidity">正在读取</span></h1>
-        <h1>当前模式： <span id="Model">正在读取</span></h1>
-        <h1>当前状态： <span id="fanStatus">正在读取</span></h1>
-        <h1>最大温度： <span id="Temperature_MAX">正在读取</span></h1>
+        <ul>
+            <li>当前温度： <span id="Temperature">正在读取</span></li>
+            <li>当前湿度： <span id="Humidity">正在读取</span></li>
+            <li>当前模式： <span id="Model">正在读取</span></li>
+            <li>当前状态： <span id="fanStatus">正在读取</span></li>
+            <li>最大温度： <span id="Temperature_MAX">正在读取</span></li>
+        </ul>
 
         <form action="fan" method="post">
-            <h1><span class="mytxt">设定最大温度(0~60)：</span>
+            <p>
+                <span id="setText">设定最大温度(0~60)：</span>
                 <input type="range" value="40" max="60" min="0" name="max_t">
-                <input type="submit" value="确定" class="button">
-            </h1>
+            </p>
             </br>
-            <input class="button" type="submit" value="open" name="status">
-            <input class="button" type="submit" value="close" name="status">
-            <input class="button" type="submit" value="auto" name="status">
+
+            <div id="radio_list">
+                <P>
+                    常开<input class="radio" type="radio" value="open" name="status">
+                    自动<input class="radio" type="radio" value="auto" name="status" checked>
+                    关闭<input class="radio" type="radio" value="close" name="status">
+                    <input type="submit" value="确定" class="button">
+                </P>
+            </div>
         </form>
     </center>
 </div>
@@ -94,6 +102,12 @@
                     xhttp.open("GET", "Humidity", true);
                     xhttp.send();
                 }
+
+
+
+
+
+
 </script>
 </body>
 

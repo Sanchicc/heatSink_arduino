@@ -59,7 +59,15 @@ h1 {
     /* 字体颜色 */
 }
 
-.mytxt {
+ul li{
+    list-style: none;
+    font-size: 40px;
+    font-weight: 900;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#setText {
     /* color: #333; */
     line-height: normal;
     font-family: "Microsoft YaHei", Tahoma, Verdana, SimSun;
@@ -91,12 +99,7 @@ h1 {
     background-size: auto;
     background-origin: padding-box;
     background-clip: border-box;
-    /* background-color: rgb(255, 255, 255); */
     margin-right: 8px;
-    /* border-top-color: #ccc; */
-    /* border-right-color: #ccc;
-    border-bottom-color: #ccc;
-    border-left-color: #ccc; */
     border-top-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
@@ -105,4 +108,12 @@ h1 {
     border-right-style: solid;
     border-bottom-style: solid;
     border-left-style: solid;
+}
+
+#radio_list{
+    margin: 1px;
+}
+
+.radio{
+    margin-right: 20px;
 }
