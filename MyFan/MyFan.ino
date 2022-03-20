@@ -6,6 +6,8 @@
 #include <DallasTemperature.h>
 #include <DFRobot_DHT11.h>
 #include <Math.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 DFRobot_DHT11 DHT;
 #define DHT11_PIN D5
 
@@ -19,8 +21,10 @@ int fanStatus;
 OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
 String temperature;
-String Model = "自动";
+String Model;
 double max_t = 40.0;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
 
 void setup()
 {
@@ -34,9 +38,12 @@ void setup()
   ticker.attach_ms(500, detect);
 
   // 默认自动模式
-  ticker2.attach(1, control_temperature);
+  ticker2.attach(2, control_temperature);
+  Model = "自动";
 
   sensors.begin();
+
+  timeClient.begin();
 
   if (SPIFFS.begin())
   { // 启动闪存文件系统
@@ -62,25 +69,28 @@ void loop()
   server.handleClient();
 
   static int i = 0;
+  static int ii = 0;
   i++;
   if (i == 100)
   {
     DHT.read(DHT11_PIN);
     sensors.requestTemperatures();
-
+    timeClient.update();
     temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
 
-    Serial.print("temp:");
-    Serial.println(temperature);
-    Serial.print("humi:");
-    Serial.println(DHT.humidity);
+    if (ii == 10) {
+      Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
+      Serial.println("湿度更新:" + String(DHT.humidity));
+      ii = 0;
+    }
     i = 0;
+    ii++;
   }
 }
 
-/* 
+/*
     回应ajax
- */
+*/
 
 // 发送温度
 void sendTemperature()
@@ -141,8 +151,11 @@ void fanControl()
   }
   else if (status == "auto")
   {
+    // 如果刚才是开着的先关掉
+    if (Model == "常开")
+      digitalWrite(FAN, 1);
     ticker2.detach();
-    ticker2.attach(1, control_temperature);
+    ticker2.attach(2, control_temperature);
     Model = "自动";
   }
   Serial.println("FAN: " + String(status));
@@ -151,6 +164,7 @@ void fanControl()
   server.send(303);
 }
 
+//自动模式 两秒调用一次
 void control_temperature()
 {
   static int time_flag = 0;
@@ -164,7 +178,7 @@ void control_temperature()
   else
   {
     if (digitalRead(FAN))
-      if (time_flag >= 30)
+      if (time_flag >= 15)
       { // 保持30秒再关
         time_flag = 0;
         digitalWrite(FAN, 1);
@@ -207,14 +221,14 @@ void wifi()
 bool handleFileRead(String path)
 { //处理浏览器HTTP访问
   if (path.endsWith("/"))
-  {                     // 如果访问地址以"/"为结尾
+  { // 如果访问地址以"/"为结尾
     path = "/fan.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
   }
 
   String contentType = getContentType(path); // 获取文件类型
 
   if (SPIFFS.exists(path))
-  {                                       // 如果访问的文件可以在SPIFFS中找到
+  { // 如果访问的文件可以在SPIFFS中找到
     File file = SPIFFS.open(path, "r");   // 则尝试打开该文件
     server.streamFile(file, contentType); // 并且将该文件返回给浏览器
     file.close();                         // 并且关闭文件
