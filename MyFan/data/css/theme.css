@@ -1,36 +1,28 @@
 body {
-    font-family: sans-serif;
-    color: #444;
-    width: 100%;
-    height: auto;
-    zoom: 1;
     margin: 0px;
-}
-
-body::before {
-    content: '';
+    padding: 0px;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -20px; /* 干掉页面上面的傻逼白边 */
+    left: 0px;
     width: 100%;
     height: 100%;
-    background-color: #33a5e7;
+    border: 0px; 
+}
+
+.button_div {
+    margin: 0 auto;
     background: linear-gradient(183deg, #33a5e7 39%, #8ee9de 100%);
-    filter: blur(5px);
-    z-index: -1;
-    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
 }
 
-.button_div{
-    margin: 0 auto;
-    width: auto;
-    height: auto;
-}
-
-div#box {
-    width: 1280px;
-    height: auto;
-    margin: 0 auto;
+h1{
+    font-size: 60px;
+    margin:20px 0px 5px 0px;
+    text-align: center;
+    position: relative;
+    left: 2%;
 }
 
 .button {
@@ -65,11 +57,12 @@ div#box {
 }
 
 /* 鼠标按下 */
-.button:active{
+.button:active {
     background-color: aqua;
 }
 
-ul li{
+ul li {
+    margin-top: 10px;
     list-style: none;
     font-size: 35px;
     font-weight: 900;
@@ -101,7 +94,6 @@ ul li{
     border-top-right-radius: 3px;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
-    /* text-shadow: 0px 1px 2px #fff; */
     background-attachment: scroll;
     background-repeat: repeat-x;
     background-position-x: left;
@@ -120,10 +112,10 @@ ul li{
     border-left-style: solid;
 }
 
-.radio_list{
+.radio_list {
     margin: 0px 40px;
 }
 
-.radio{
-    margin:0px 25px;
+.radio {
+    margin: 0px 25px;
 }
