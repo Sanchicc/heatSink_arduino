@@ -26,11 +26,11 @@
             </p>
             </br>
 
-            <div id="radio_list">
+            <div class="radio_list">
                 <P>
-                    常开<input class="radio" type="radio" value="open" name="status">
-                    自动<input class="radio" type="radio" value="auto" name="status" checked>
-                    关闭<input class="radio" type="radio" value="close" name="status">
+                    <span class="radio" >常开<input type="radio" value="open" name="status"></span>
+                    <span class="radio" >自动<input type="radio" value="auto" name="status" checked></span>
+                    <span class="radio" >关闭<input type="radio" value="close" name="status"></span>
                 </P>
 
                 <input type="submit" value="确定" class="button">
@@ -104,10 +104,6 @@
                     xhttp.open("GET", "Humidity", true);
                     xhttp.send();
                 }
-
-
-
-
 
 
 </script>
