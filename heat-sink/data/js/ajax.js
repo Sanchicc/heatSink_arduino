@@ -4,13 +4,13 @@ getTemperature_MAX();
 getfanStatus();
 getHumidity();
 
-// setInterval(function () {
-//     getData();
-//     getModel();
-//     getTemperature_MAX();
-//     getfanStatus();
-//     getHumidity();
-// }, 1000);
+setInterval(function () {
+    getData();
+    getModel();
+    getTemperature_MAX();
+    getfanStatus();
+    getHumidity();
+}, 1000);
 
 setInterval(
     function () {
