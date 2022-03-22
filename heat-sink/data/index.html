@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <div id="cloth"></div>
     <div class="button_div">
         <center>
             <h1></h1>
@@ -44,8 +45,8 @@
                     </P>
 
                     <p>
-                    <input type="submit" value="确定" class="button">
-                    <input type="button" value="归位" class="button" onclick="reset()">
+                        <input type="submit" value="确定" class="button">
+                        <input type="button" value="归位" class="button" onclick="reset()">
                     </p>
                 </div>
             </form>
@@ -54,34 +55,8 @@
 
     <script src="js/ajax.js"></script>
 
-    <div id="content" class="mw-body" role="main"></div>
-
-    <script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
-    
-    <script>
-        L2Dwidget.init({
-            "model": {
-                "jsonPath": "https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json",
-                "scale": 1
-            },
-            "display": {
-                "position": "right",
-                "width": 70,
-                "height": 200,
-                "hOffset": 20,
-                "vOffset": -90
-            },
-            "mobile": {
-                "show": true,
-                "scale": 0.5
-            },
-            "react": {
-                "opacityDefault": 1,
-                "opacityOnHover": 0.2
-            }
-        });
-    </script>
-
+    <div class="back-to-top cd-top faa-float animated cd-is-visible" style="top: -200px;"></div>
+    <link rel="stylesheet" href="css/szgotop.css">
 </body>
 
 </html>
