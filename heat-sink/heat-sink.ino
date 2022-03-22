@@ -222,7 +222,7 @@ bool handleFileRead(String path)
 { //处理浏览器HTTP访问
   if (path.endsWith("/"))
   { // 如果访问地址以"/"为结尾
-    path = "/fan.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
+    path = "/index.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
   }
 
   String contentType = getContentType(path); // 获取文件类型
