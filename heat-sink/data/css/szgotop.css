@@ -1016,12 +1016,12 @@
 .back-to-top {
     cursor: pointer;
     position: fixed;
-    right: 15px;
+    right: 20%;
     top: -50%;
     z-index: 2;
     width: 100px;
     height: 900px;
     background-image: url(../images/top.png);
-    transition: all .5s ease-in-out;
+    transition: all .7s ease-in-out;
     opacity: 1;
 }

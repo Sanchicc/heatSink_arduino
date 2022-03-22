@@ -35,7 +35,7 @@ void setup()
   pinMode(A0, OUTPUT);
   digitalWrite(FAN, 1);
 
-  ticker.attach_ms(500, detect);
+  ticker.attach(1, detect);
 
   // 默认自动模式
   ticker2.attach(2, control_temperature);
@@ -68,25 +68,25 @@ void loop()
 {
   server.handleClient();
 
-  static int i = 0;
-  static int ii = 0;
-  i++;
-  if (i == 100)
-  {
-    DHT.read(DHT11_PIN);
-    sensors.requestTemperatures();
-    timeClient.update();
-    temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
+  // 轮流更新数据
+  static long i = 0;
 
-    if (ii == 10)
-    {
-      Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
-      Serial.println("湿度更新:" + String(DHT.humidity));
-      ii = 0;
-    }
-    i = 0;
-    ii++;
+  if (i == 0) {
+    DHT.read(DHT11_PIN);
+  } else if (i == 1000) {
+    sensors.requestTemperatures();
+  } else if (i == 2000) {
+    timeClient.update();
   }
+
+  if (i == 10 || i == 1000){
+    temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
+    Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
+    Serial.println("湿度更新:" + String(DHT.humidity));
+  }
+  
+  i += 1;
+  if (i > 100000)i = 0;
 }
 
 /*
@@ -222,14 +222,14 @@ void wifi()
 bool handleFileRead(String path)
 { //处理浏览器HTTP访问
   if (path.endsWith("/"))
-  {                       // 如果访问地址以"/"为结尾
+  { // 如果访问地址以"/"为结尾
     path = "/index.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
   }
 
   String contentType = getContentType(path); // 获取文件类型
 
   if (SPIFFS.exists(path))
-  {                                       // 如果访问的文件可以在SPIFFS中找到
+  { // 如果访问的文件可以在SPIFFS中找到
     File file = SPIFFS.open(path, "r");   // 则尝试打开该文件
     server.streamFile(file, contentType); // 并且将该文件返回给浏览器
     file.close();                         // 并且关闭文件

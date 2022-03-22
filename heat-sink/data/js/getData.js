@@ -22,7 +22,7 @@ function getData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Temperature").innerHTML = this.responseText;
+            document.getElementById("Temperature").innerText = this.responseText;
         }
     };
     xhttp.open("GET", "temperature", true);
@@ -63,7 +63,7 @@ function getfanStatus() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("fanStatus").innerHTML = this.responseText;
+            document.getElementById("fanStatus").innerText = this.responseText;
         }
     };
     xhttp.open("GET", "fanStatus", true);
@@ -74,7 +74,7 @@ function getHumidity() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Humidity").innerHTML = this.responseText;
+            document.getElementById("Humidity").innerText = this.responseText;
         }
     };
     xhttp.open("GET", "Humidity", true);
