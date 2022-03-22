@@ -10,21 +10,31 @@
 <body>
     <div class="button_div">
         <center>
-            <h1><strong>ESP8266</strong></h1>
-            <ul>
-                <li>当前温度： <span id="Temperature">正在读取</span></li>
-                <li>当前湿度： <span id="Humidity">正在读取</span></li>
-                <li>当前模式： <span id="Model">正在读取</span></li>
-                <li>当前状态： <span id="fanStatus">正在读取</span></li>
-                <li>最大温度： <span id="Temperature_MAX">正在读取</span></li>
-            </ul>
+            <h1></h1>
+            <table class="tables">
+                <tr>
+                    <td>温度： </td>
+                    <td><span id="Temperature">正在读取</span></td>
+                </tr>
+                <tr>
+                    <td>湿度：</td>
+                    <td><span id="Humidity">正在读取</span></td>
+                </tr>
+                <tr>
+                    <td>模式：</td>
+                    <td><span id="Model">正在读取</span></td>
+                <tr>
+                    <td>状态：</td>
+                    <td> <span id="fanStatus">正在读取</span></td>
+                </tr>
+            </table>
 
             <form action="fan" method="post">
                 <p>
-                    <span id="setText">设定最大温度(0~60)：</span>
-                    <input type="range" value="40" max="60" min="0" name="max_t" id="set_max_t">
+                    <span id="setText">设定最大温度：</span>
+                    <input type="range" value="40" max="70" min="0" name="max_t" id="setMaxT">
+                    <span id="rangeCurrentValue"></span>
                 </p>
-                </br>
 
                 <div id="radio_list">
                     <P>
@@ -33,13 +43,15 @@
                         <span class="radio">关闭<input type="radio" value="close" name="status"></span>
                     </P>
 
+                    <p>
                     <input type="submit" value="确定" class="button">
-                    <input type="reset" class="button">
+                    <input type="button" value="归位" class="button" onclick="reset()">
+                    </p>
                 </div>
             </form>
         </center>
     </div>
-    
+
     <script src="js/ajax.js"></script>
 </body>
 

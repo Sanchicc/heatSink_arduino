@@ -78,7 +78,8 @@ void loop()
     timeClient.update();
     temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
 
-    if (ii == 10) {
+    if (ii == 10)
+    {
       Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
       Serial.println("湿度更新:" + String(DHT.humidity));
       ii = 0;
@@ -221,14 +222,14 @@ void wifi()
 bool handleFileRead(String path)
 { //处理浏览器HTTP访问
   if (path.endsWith("/"))
-  { // 如果访问地址以"/"为结尾
+  {                       // 如果访问地址以"/"为结尾
     path = "/index.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
   }
 
   String contentType = getContentType(path); // 获取文件类型
 
   if (SPIFFS.exists(path))
-  { // 如果访问的文件可以在SPIFFS中找到
+  {                                       // 如果访问的文件可以在SPIFFS中找到
     File file = SPIFFS.open(path, "r");   // 则尝试打开该文件
     server.streamFile(file, contentType); // 并且将该文件返回给浏览器
     file.close();                         // 并且关闭文件

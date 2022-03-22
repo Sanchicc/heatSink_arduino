@@ -4,14 +4,19 @@ getTemperature_MAX();
 getfanStatus();
 getHumidity();
 
-setInterval(function () {
-    // Call a function repetatively with 1 Second interval
-    getData();
-    getModel();
-    getTemperature_MAX();
-    getfanStatus();
-    getHumidity();
-}, 1000); //1000mSeconds update rate
+// setInterval(function () {
+//     getData();
+//     getModel();
+//     getTemperature_MAX();
+//     getfanStatus();
+//     getHumidity();
+// }, 1000);
+
+setInterval(
+    function () {
+        var rangeCurrentValue = document.getElementById('rangeCurrentValue');
+        rangeCurrentValue.innerText = document.getElementById('setMaxT').value;
+    }, 50);
 
 function getData() {
     var xhttp = new XMLHttpRequest();
@@ -28,7 +33,14 @@ function getModel() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Model").innerHTML = this.responseText;
+            // 同步单选框
+            var i;
+            switch (this.responseText) {
+                case 'open': i = 0; break;
+                case 'close': i = 2; break;
+                default: i = 1;
+            }
+            document.querySelectorAll('#radio_list P input')[i] = true;
         }
     };
     xhttp.open("GET", "Model", true);
@@ -39,7 +51,8 @@ function getTemperature_MAX() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("Temperature_MAX").innerHTML = this.responseText;
+            // 设一下值
+            document.getElementById('setMaxT').value = this.responseText;
         }
     };
     xhttp.open("GET", "Temperature_MAX", true);
@@ -66,4 +79,9 @@ function getHumidity() {
     };
     xhttp.open("GET", "Humidity", true);
     xhttp.send();
+}
+
+function reset() {
+    document.getElementById('setMaxT').value = '40';
+    document.querySelectorAll('#radio_list P input')[1] = true;
 }
