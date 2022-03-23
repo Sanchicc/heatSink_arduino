@@ -1,27 +1,42 @@
+var devorators = {
+    s1,
+    s2,
+    s3,
+    s4,
+    s5
+};
+
 function decorator() {
     var decorator = document.getElementById('decorator');
 
-    setTimeout(function () {
         decorator.style.top = '-0%';
 
-        setTimeout(function () {
+        decorator.s1 = setTimeout(function () {
             decorator.style.top = '-90%';
         }, 800);
 
-        setTimeout(function () {
+        decorator.s2 = setTimeout(function () {
             decorator.style.top = '-35%';
         }, 1500);
 
-        setTimeout(function () {
+        decorator.s3 = setTimeout(function () {
             decorator.style.top = '-74%';
         }, 2250);
 
-        setTimeout(function () {
+        decorator.s4 =  setTimeout(function () {
             decorator.style.top = '-40%';
         }, 2850);
 
-        setTimeout(function () {
+        decorator.s5 = setTimeout(function () {
             decorator.style.top = '-50%';
         }, 3600);
-    }, 0);
+}
+
+function decorator_down(){
+    clearTimeout(decorator.s1);
+    clearTimeout(decorator.s2);
+    clearTimeout(decorator.s3);
+    clearTimeout(decorator.s4);
+    clearTimeout(decorator.s5);
+    decorator();
 }
