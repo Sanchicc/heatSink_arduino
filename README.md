@@ -2,5 +2,5 @@
 
 用于~~玩猫羽雫~~控制我电脑的外置风扇
 
-大概长这样:
-![图片](https://github.com/Sanchicc/heatSink_arduino/blob/master/heat-sink/demo.png)
+长这样,除了猫羽雫,其他的丑爆了对吧？
+![图片](https://github.com/Sanchicc/heatSink_arduino/raw/master/demo.png)
