@@ -13,7 +13,7 @@ if (flag === true) {
         getTemperature_MAX();
         getfanStatus();
         getHumidity();
-    }, 1000);
+    }, 10000);
 }
 
 setInterval(
