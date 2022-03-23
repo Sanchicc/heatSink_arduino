@@ -1,16 +1,20 @@
-getData();
-getModel();
-getTemperature_MAX();
-getfanStatus();
-getHumidity();
+var flag = true; // 调试用的
 
-setInterval(function () {
+if (flag === true) {
     getData();
     getModel();
     getTemperature_MAX();
     getfanStatus();
     getHumidity();
-}, 1000);
+
+    setInterval(function () {
+        getData();
+        getModel();
+        getTemperature_MAX();
+        getfanStatus();
+        getHumidity();
+    }, 1000);
+}
 
 setInterval(
     function () {
@@ -84,4 +88,22 @@ function getHumidity() {
 function reset() {
     document.getElementById('setMaxT').value = '40';
     document.querySelectorAll('#radio_list P input')[1] = true;
+}
+
+// 提交
+function postCurrentValue() {
+    var setMaxT = document.getElementById('setMaxT').value;
+    var radios = document.getElementsByName('status');
+    var radiosValue;
+    for (let i = 0; i < 3; i++)
+        if (radios[i].checked === true) {
+            radiosValue = radios[i].value;
+        }
+
+    console.log(radiosValue);
+    console.log(setMaxT);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "fan", true);
+    xhttp.send("max_t=${setMaxT}&status=${radiosValue}");
 }

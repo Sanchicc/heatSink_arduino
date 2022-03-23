@@ -1,62 +1,59 @@
-<!DOCTYPE html>
-
 <head>
     <link rel="icon" href="images/logo.png">
     <meta charset="UTF-8">
-    <title>机箱温度控制台</title>
+    <title>控制台</title>
     <link rel="stylesheet" href="css/theme.css">
 </head>
 
-<body>
-    <center>
+<body onmousedown="decorator_down()">
     <div id="button_div">
+            <table class="tables">
+                <tr>
+                    <td>温度： </td>
+                    <td><span id="Temperature">正在读取</span></td>
+                </tr>
+                <tr>
+                    <td>湿度：</td>
+                    <td><span id="Humidity">正在读取</span></td>
+                </tr>
+                <tr>
+                    <td>模式：</td>
+                    <td><span id="Model">正在读取</span></td>
+                <tr>
+                    <td>状态：</td>
+                    <td> <span id="fanStatus">正在读取</span></td>
+                </tr>
+            </table>
 
-        <table class="tables">
-            <tr>
-                <td>温度： </td>
-                <td><span id="Temperature">正在读取</span></td>
-            </tr>
-            <tr>
-                <td>湿度：</td>
-                <td><span id="Humidity">正在读取</span></td>
-            </tr>
-            <tr>
-                <td>模式：</td>
-                <td><span id="Model">正在读取</span></td>
-            <tr>
-                <td>状态：</td>
-                <td> <span id="fanStatus">正在读取</span></td>
-            </tr>
-        </table>
-
-        <form action="fan" method="post">
-            <p>
-                <span id="setText">设定最大温度：</span>
-                <input type="range" value="40" max="70" min="0" name="max_t" id="setMaxT">
-                <span id="rangeCurrentValue"></span>
-            </p>
-
-            <div id="radio_list">
-                <P>
-                    <span class="radio">常开<input type="radio" value="open" name="status"></span>
-                    <span class="radio">自动<input type="radio" value="auto" name="status" checked></span>
-                    <span class="radio">关闭<input type="radio" value="close" name="status"></span>
-                </P>
-
+            <form action="fan" method="post">
                 <p>
-                    <input type="submit" value="确定" class="button">
-                    <input type="button" value="归位" class="button" onclick="reset()">
+                    <span id="setText">设定最大温度：</span>
+                    <input type="range" value="40" max="70" min="0" name="max_t" id="setMaxT"
+                        onchange="postCurrentValue()">
+                    <span id="rangeCurrentValue"></span>
                 </p>
-            </div>
-        </form>
 
+                <div id="radio_list">
+                    <P onmousedown="postCurrentValue()">
+                        <span class="radio">常开<input type="radio" value="open" name="status"></span>
+                        <span class="radio">自动<input type="radio" value="auto" name="status" checked></span>
+                        <span class="radio">关闭<input type="radio" value="close" name="status"></span>
+                    </P>
+
+                    <p>
+                        <!-- 这是摆设 -->
+                        <input type="button" value="确定" class="button" onclick="postCurrentValue()">
+                        <input type="button" value="归位" class="button" onclick="reset()">
+                    </p>
+                </div>
+            </form>
     </div>
-</center>
 
-    <!-- <script src="js/getData.js"></script> -->
+    <script src="js/getData.js"></script>
     <script src="js/decorator.js"></script>
 
-    <div class="back-to-top cd-top faa-float animated cd-is-visible" id="decorator" onmousedown="decorator_down()"></div>
+    <div class="back-to-top cd-top faa-float animated cd-is-visible" id="decorator" onmousedown="decorator_down()">
+    </div>
     <link rel="stylesheet" href="css/szgotop.css">
 </body>
 
