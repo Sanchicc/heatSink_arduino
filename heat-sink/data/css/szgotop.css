@@ -1021,7 +1021,7 @@
     z-index: 2;
     width: 100px;
     height: 900px;
-    background-image: url(../images/top.png);
+    background-image: url(../images/cat.png);
     transition: all .7s ease-in-out;
     opacity: 1;
 }
