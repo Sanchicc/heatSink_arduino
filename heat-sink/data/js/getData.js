@@ -112,6 +112,7 @@ function postCurrentValue() {
     xhttp.send("max_t=${setMaxT}&status=${radiosValue}");
 }
 
+// 存放数据
 var data = {
     temperature: '0',
     Model: '0',

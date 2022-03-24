@@ -269,6 +269,7 @@ String getJsonData()
   json += "fanStatus:" + digitalRead(FAN) ? "关闭" : "开启" + ",";
   json += "Humidity:" + String(DHT.humidity);
   json += "}";
+  return json;
 }
 
 // 获取文件类型
