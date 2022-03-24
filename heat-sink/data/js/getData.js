@@ -1,4 +1,4 @@
-var flag = true; // 调试用的
+var flag = false; // 调试用的
 
 if (flag === true) {
     getData();
@@ -14,6 +14,10 @@ if (flag === true) {
         getfanStatus();
         getHumidity();
     }, 10000);
+} else {
+    setInterval(function () {
+        getJson();
+    }, 5000);
 }
 
 setInterval(
@@ -106,4 +110,40 @@ function postCurrentValue() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "fan", true);
     xhttp.send("max_t=${setMaxT}&status=${radiosValue}");
+}
+
+var data = {
+    temperature: '0',
+    Model: '0',
+    Temperature_MAX: '0',
+    fanStatus: '0',
+    Humidity: '0'
+};
+
+
+function getJson() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            console.log(data);
+            setData(data);
+        }
+    };
+    xhttp.open("GET", "json", true);
+    xhttp.send();
+}
+
+function setData(data) {
+    document.getElementById("Temperature").innerText = data.temperature;
+    var i;
+    switch (data.Model) {
+        case 'open': i = 0; break;
+        case 'close': i = 2; break;
+        default: i = 1;
+    }
+    document.querySelectorAll('#radio_list P input')[i] = true;
+    document.getElementById('setMaxT').value = data.Temperature_MAX;
+    document.getElementById("fanStatus").innerText = data.fanStatus;
+    document.getElementById("Humidity").innerText = data.Humidity;
 }

@@ -61,6 +61,7 @@ void setup()
   server.on("/Humidity", sendHumidity);
   server.on("/Model", sendModel);
   server.on("/Temperature_MAX", sendTemperature_MAX);
+  server.on("/json", sendJsonData);
   server.onNotFound(handleTheClient);
 }
 
@@ -71,27 +72,39 @@ void loop()
   // 轮流更新数据
   static long i = 0;
 
-  if (i == 0) {
+  if (i == 0)
+  {
     DHT.read(DHT11_PIN);
-  } else if (i == 1000) {
+  }
+  else if (i == 1000)
+  {
     sensors.requestTemperatures();
-  } else if (i == 2000) {
+  }
+  else if (i == 2000)
+  {
     timeClient.update();
   }
 
-  if (i == 10 || i == 1000){
+  if (i == 10 || i == 1000)
+  {
     temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
     Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
     Serial.println("湿度更新:" + String(DHT.humidity));
   }
-  
+
   i += 1;
-  if (i > 100000)i = 0;
+  if (i > 100000)
+    i = 0;
 }
 
 /*
     回应ajax
 */
+
+void sendJsonData()
+{
+  server.send(200, "text/plain", String(getJsonData()));
+}
 
 // 发送温度
 void sendTemperature()
@@ -222,20 +235,40 @@ void wifi()
 bool handleFileRead(String path)
 { //处理浏览器HTTP访问
   if (path.endsWith("/"))
-  { // 如果访问地址以"/"为结尾
+  {                       // 如果访问地址以"/"为结尾
     path = "/index.html"; // 则将访问地址修改为/index.html便于SPIFFS访问
   }
 
   String contentType = getContentType(path); // 获取文件类型
 
   if (SPIFFS.exists(path))
-  { // 如果访问的文件可以在SPIFFS中找到
+  {                                       // 如果访问的文件可以在SPIFFS中找到
     File file = SPIFFS.open(path, "r");   // 则尝试打开该文件
     server.streamFile(file, contentType); // 并且将该文件返回给浏览器
     file.close();                         // 并且关闭文件
     return true;                          // 返回true
   }
   return false; // 如果文件未找到，则返回false
+}
+
+/*
+var data = {
+    temperature: '0',
+    Model: '0',
+    Temperature_MAX: '0',
+    fanStatus: '0',
+    Humidity: '0'
+};
+*/
+String getJsonData()
+{
+  String json = "{";
+  json += "temperature:" + String(temperature) + ",";
+  json += "Model:" + String(Model) + ",";
+  json += "Temperature_MAX:" + String(max_t) + ",";
+  json += "fanStatus:" + digitalRead(FAN) ? "关闭" : "开启" + ",";
+  json += "Humidity:" + String(DHT.humidity);
+  json += "}";
 }
 
 // 获取文件类型

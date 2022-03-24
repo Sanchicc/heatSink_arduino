@@ -4,4 +4,4 @@
 
 长这样 
 ![图片](https://github.com/Sanchicc/heatSink_arduino/raw/master/demo.png)
-这猫真可爱 ~~其他的丑爆了~~
+这猫真可爱
