@@ -16,7 +16,6 @@ DFRobot_DHT11 DHT;
 WiFiClient client;
 ESP8266WebServer server(80);
 Ticker ticker;
-Ticker ticker2;
 int fanStatus;
 OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
@@ -34,17 +33,17 @@ void setup()
   pinMode(FAN, OUTPUT);
   pinMode(A0, OUTPUT);
   digitalWrite(FAN, 1);
-
-  ticker.attach(1, detect);
-
+  
   // 默认自动模式
-  ticker2.attach(2, control_temperature);
+  ticker.attach(1, control_temperature);
   Model = "自动";
 
   sensors.begin();
-
+  sensors.requestTemperatures();
+  DHT.read(DHT11_PIN);
   timeClient.begin();
-
+  timeClient.update();
+  
   if (SPIFFS.begin())
   { // 启动闪存文件系统
     Serial.println("SPIFFS Started.");
@@ -56,11 +55,6 @@ void setup()
 
   server.begin();
   server.on("/fan", fanControl);
-  server.on("/fanStatus", sendfanStatus);
-  server.on("/temperature", sendTemperature);
-  server.on("/Humidity", sendHumidity);
-  server.on("/Model", sendModel);
-  server.on("/Temperature_MAX", sendTemperature_MAX);
   server.on("/json", sendJsonData);
   server.onNotFound(handleTheClient);
 }
@@ -72,7 +66,7 @@ void loop()
   // 轮流更新数据
   static long i = 0;
 
-  if (i == 0)
+  if (i == 1)
   {
     DHT.read(DHT11_PIN);
   }
@@ -97,46 +91,10 @@ void loop()
     i = 0;
 }
 
-/*
-    回应ajax
-*/
-
+// 回应ajax
 void sendJsonData()
 {
   server.send(200, "text/plain", String(getJsonData()));
-}
-
-// 发送温度
-void sendTemperature()
-{
-  server.send(200, "text/plain", String(temperature));
-}
-
-// 发送模式
-void sendModel()
-{
-  server.send(200, "text/plain", Model);
-}
-
-// 发送湿度
-void sendHumidity()
-{
-  server.send(200, "text/plain", String(DHT.humidity));
-}
-
-void sendTemperature_MAX()
-{
-  server.send(200, "text/plain", String(max_t));
-}
-
-void sendfanStatus()
-{
-  server.send(200, "text/plain", digitalRead(FAN) ? "关闭" : "开启");
-}
-
-void detect()
-{
-  fanStatus = digitalRead(FAN);
 }
 
 void fanControl()
@@ -153,13 +111,13 @@ void fanControl()
 
   if (status == "open")
   {
-    ticker2.detach();
+    ticker.detach();
     digitalWrite(FAN, 0);
     Model = "常开";
   }
   else if (status == "close")
   {
-    ticker2.detach();
+    ticker.detach();
     digitalWrite(FAN, 1);
     Model = "关闭";
   }
@@ -168,17 +126,15 @@ void fanControl()
     // 如果刚才是开着的先关掉
     if (Model == "常开")
       digitalWrite(FAN, 1);
-    ticker2.detach();
-    ticker2.attach(2, control_temperature);
+    ticker.detach();
+    ticker.attach(1, control_temperature);
     Model = "自动";
   }
-  Serial.println("FAN: " + String(status));
-
-  server.sendHeader("Location", "/");
-  server.send(303);
+  Serial.println("模式: " + String(status));
+  fanStatus = digitalRead(FAN);
 }
 
-//自动模式 两秒调用一次
+//自动模式
 void control_temperature()
 {
   static int time_flag = 0;
@@ -263,11 +219,11 @@ var data = {
 String getJsonData()
 {
   String json = "{";
-  json += "temperature:" + String(temperature) + ",";
-  json += "Model:" + String(Model) + ",";
-  json += "Temperature_MAX:" + String(max_t) + ",";
-  json += "fanStatus:" + digitalRead(FAN) ? "关闭" : "开启" + ",";
-  json += "Humidity:" + String(DHT.humidity);
+  json += "\"temperature\":\"" + String(temperature) + "\",";
+  json += "\"Model\":\"" + String(Model) + "\",";
+  json += "\"Temperature_MAX\":\"" + String(max_t) + "\",";
+  json += "\"fanStatus\":\"" + String(digitalRead(FAN) ? "关闭" : "开启") + "\",";
+  json += "\"Humidity\":\"" + String(DHT.humidity)+ "\"";
   json += "}";
   return json;
 }
