@@ -24,10 +24,10 @@ NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
 // 封装各种参数
 struct
 {
-  double max_t = 40.0;
-  int fanStatus;
+  float max_t = 40.0f;
+  int status;
   String temperature;
-  String Model;
+  String model;
 } msg;
 
 void setup()
@@ -41,10 +41,12 @@ void setup()
 
   // 默认自动模式
   ticker.attach(1, control_temperature, false);
-  msg.Model = "自动";
+  msg.model = "自动";
 
   sensors.begin();
   timeClient.begin();
+  DHT.read(DHT11_PIN);
+  sensors.requestTemperatures();
 
   if (SPIFFS.begin())
   { // 启动闪存文件系统
@@ -56,7 +58,7 @@ void setup()
   }
 
   server.begin();
-  server.on("/fan", fanControl);
+  server.on("/submit", Receive);
   server.on("/json", sendJsonData);
   server.onNotFound(handleTheClient);
 }
@@ -64,7 +66,9 @@ void setup()
 void loop()
 {
   server.handleClient();
-
+    
+  msg.temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
+  
   // 轮流更新数据
   static long i = 0;
 
@@ -83,7 +87,6 @@ void loop()
 
   if (i == 10 || i == 1000)
   {
-    msg.temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
     Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(msg.temperature));
     Serial.println("湿度更新:" + String(DHT.humidity));
   }
@@ -105,7 +108,7 @@ void control_temperature(bool flag)
   static int time_flag = 0;
   time_flag++;
 
-  if (msg.temperature.toDouble() > msg.max_t)
+  if (msg.temperature.toFloat() > msg.max_t)
   {
     digitalWrite(FAN, 0);
     time_flag = 0;
@@ -122,10 +125,10 @@ void control_temperature(bool flag)
   }
 }
 
-void fanControl()
+void Receive()
 {
   String status = server.arg("status");
-  double tmp = server.arg("max_t").toDouble();
+  double tmp = server.arg("max_t").toFloat();
 
   if (tmp != 0.00)
   {
@@ -138,27 +141,29 @@ void fanControl()
   {
     ticker.detach();
     digitalWrite(FAN, 0);
-    msg.Model = "常开";
+    msg.model = "常开";
   }
   else if (status == "close")
   {
     ticker.detach();
     digitalWrite(FAN, 1);
-    msg.Model = "关闭";
+    msg.model = "关闭";
   }
   else if (status == "auto")
   {
     // 如果刚才是开着的先关掉
-    if (msg.Model == "常开")
+    if (msg.model == "常开")
       digitalWrite(FAN, 1);
     ticker.detach();
     ticker.attach(1, control_temperature, false);
-    msg.Model = "自动";
+    msg.model = "自动";
   }
   Serial.println("模式: " + String(status));
-  msg.fanStatus = digitalRead(FAN);
+  msg.status = digitalRead(FAN);
 
   control_temperature(true);
+  
+  server.send(200);
 }
 
 void handleTheClient()
@@ -215,9 +220,9 @@ bool handleFileRead(String path)
 /*
 var data = {
     temperature: '0',
-    Model: '0',
-    Temperature_MAX: '0',
-    fanStatus: '0',
+    model: '0',
+    max_t: '0',
+    status: '0',
     Humidity: '0'
 };
 */
@@ -225,9 +230,9 @@ String getJsonData()
 {
   String json = "{";
   json += "\"temperature\":\"" + String(msg.temperature) + "\",";
-  json += "\"Model\":\"" + String(msg.Model) + "\",";
-  json += "\"Temperature_MAX\":\"" + String(msg.max_t) + "\",";
-  json += "\"fanStatus\":\"" + String(digitalRead(FAN) ? "关闭" : "开启") + "\",";
+  json += "\"model\":\"" + String(msg.model) + "\",";
+  json += "\"max_t\":\"" + String(msg.max_t) + "\",";
+  json += "\"status\":\"" + String(digitalRead(FAN) ? "关闭" : "开启") + "\",";
   json += "\"Humidity\":\"" + String(DHT.humidity) + "\"";
   json += "}";
   return json;

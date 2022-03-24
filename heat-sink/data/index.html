@@ -19,11 +19,11 @@
                 </tr>
                 <tr>
                     <td>状态：</td>
-                    <td> <span id="fanStatus">正在读取</span></td>
+                    <td> <span id="status">正在读取</span></td>
                 </tr>
             </table>
 
-            <form action="fan" method="post">
+            <form>
                 <p>
                     <span id="setText">设定最大温度：</span>
                     <input type="range" value="40" max="70" min="0" name="max_t" id="setMaxT"
@@ -51,7 +51,7 @@
     <script src="js/getData.js"></script>
     <script src="js/decorator.js"></script>
 
-    <div class="back-to-top cd-top faa-float animated cd-is-visible" id="decorator" onmousedown="decorator_down()" onmouseup="postCurrentValue()">
+    <div class="back-to-top cd-top faa-float animated cd-is-visible" id="decorator" onmousedown="decorator_down()">
     </div>
     <link rel="stylesheet" href="css/szgotop.css">
 </body>
