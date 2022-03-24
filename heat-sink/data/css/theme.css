@@ -56,6 +56,11 @@ h1 {
     height: 100%;
 }
 
+#padding_div {
+    position: relative;
+    top: 5%
+}
+
 .tables {
     padding: 10px;
     list-style: none;
@@ -67,12 +72,16 @@ h1 {
     /* 这个屑表格还得单独设居中 */
 }
 
+
 /* 鼠标进入 */
+
 .button:hover {
     background: #5599FF;
 }
 
+
 /* 鼠标按下 */
+
 .button:active {
     background-color: aqua;
 }
