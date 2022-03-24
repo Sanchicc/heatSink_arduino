@@ -35,14 +35,11 @@ void setup()
   digitalWrite(FAN, 1);
   
   // 默认自动模式
-  ticker.attach(1, control_temperature);
+  ticker.attach(1, control_temperature, false);
   Model = "自动";
 
   sensors.begin();
-  sensors.requestTemperatures();
-  DHT.read(DHT11_PIN);
   timeClient.begin();
-  timeClient.update();
   
   if (SPIFFS.begin())
   { // 启动闪存文件系统
@@ -97,6 +94,30 @@ void sendJsonData()
   server.send(200, "text/plain", String(getJsonData()));
 }
 
+
+//自动模式
+void control_temperature(bool flag)
+{
+  static int time_flag = 0;
+  time_flag++;
+
+  if (temperature.toDouble() > max_t)
+  {
+    digitalWrite(FAN, 0);
+    time_flag = 0;
+  }
+  else
+  {
+    if (digitalRead(FAN))
+     // 控制台的调用那么无视三十秒
+      if (time_flag >= 15 || flag == true)
+      { // 保持30秒再关
+        time_flag = 0;
+        digitalWrite(FAN, 1);
+      }
+  }
+}
+
 void fanControl()
 {
   String status = server.arg("status");
@@ -127,33 +148,13 @@ void fanControl()
     if (Model == "常开")
       digitalWrite(FAN, 1);
     ticker.detach();
-    ticker.attach(1, control_temperature);
+    ticker.attach(1, control_temperature, false);
     Model = "自动";
   }
   Serial.println("模式: " + String(status));
   fanStatus = digitalRead(FAN);
-}
 
-//自动模式
-void control_temperature()
-{
-  static int time_flag = 0;
-  time_flag++;
-
-  if (temperature.toDouble() > max_t)
-  {
-    digitalWrite(FAN, 0);
-    time_flag = 0;
-  }
-  else
-  {
-    if (digitalRead(FAN))
-      if (time_flag >= 15)
-      { // 保持30秒再关
-        time_flag = 0;
-        digitalWrite(FAN, 1);
-      }
-  }
+  control_temperature(true);
 }
 
 void handleTheClient()

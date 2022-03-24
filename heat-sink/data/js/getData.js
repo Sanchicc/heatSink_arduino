@@ -3,7 +3,7 @@
 getJson();
 setInterval(function () {
     getJson();
-}, 5000);
+}, 1000);
 
 // 显示滑块的值
 setInterval(
