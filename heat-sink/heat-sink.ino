@@ -8,22 +8,27 @@
 #include <Math.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+
 DFRobot_DHT11 DHT;
 #define DHT11_PIN D5
-
 #define ONE_WIRE_BUS D4
 #define FAN D1
 WiFiClient client;
 ESP8266WebServer server(80);
 Ticker ticker;
-int fanStatus;
 OneWire onewire(ONE_WIRE_BUS);
 DallasTemperature sensors(&onewire);
-String temperature;
-String Model;
-double max_t = 40.0;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
+
+// 封装各种参数
+struct
+{
+  float max_t = 40.0f;
+  int status;
+  String temperature;
+  String model;
+} msg;
 
 void setup()
 {
@@ -33,17 +38,16 @@ void setup()
   pinMode(FAN, OUTPUT);
   pinMode(A0, OUTPUT);
   digitalWrite(FAN, 1);
-  
+
   // 默认自动模式
-  ticker.attach(1, control_temperature);
-  Model = "自动";
+  ticker.attach(1, control_temperature, false);
+  msg.model = "自动";
 
   sensors.begin();
-  sensors.requestTemperatures();
-  DHT.read(DHT11_PIN);
   timeClient.begin();
-  timeClient.update();
-  
+  DHT.read(DHT11_PIN);
+  sensors.requestTemperatures();
+
   if (SPIFFS.begin())
   { // 启动闪存文件系统
     Serial.println("SPIFFS Started.");
@@ -54,7 +58,7 @@ void setup()
   }
 
   server.begin();
-  server.on("/fan", fanControl);
+  server.on("/submit", Receive);
   server.on("/json", sendJsonData);
   server.onNotFound(handleTheClient);
 }
@@ -62,7 +66,9 @@ void setup()
 void loop()
 {
   server.handleClient();
-
+    
+  msg.temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
+  
   // 轮流更新数据
   static long i = 0;
 
@@ -81,8 +87,7 @@ void loop()
 
   if (i == 10 || i == 1000)
   {
-    temperature = String(max(sensors.getTempCByIndex(0), (float)DHT.temperature));
-    Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(temperature));
+    Serial.print("时间：" + String(timeClient.getFormattedTime()) + "温度更新:" + String(msg.temperature));
     Serial.println("湿度更新:" + String(DHT.humidity));
   }
 
@@ -97,50 +102,13 @@ void sendJsonData()
   server.send(200, "text/plain", String(getJsonData()));
 }
 
-void fanControl()
-{
-  String status = server.arg("status");
-  double tmp = server.arg("max_t").toDouble();
-
-  if (tmp != 0.00)
-  {
-    max_t = tmp;
-  }
-
-  Serial.println("最大温度：" + String(max_t));
-
-  if (status == "open")
-  {
-    ticker.detach();
-    digitalWrite(FAN, 0);
-    Model = "常开";
-  }
-  else if (status == "close")
-  {
-    ticker.detach();
-    digitalWrite(FAN, 1);
-    Model = "关闭";
-  }
-  else if (status == "auto")
-  {
-    // 如果刚才是开着的先关掉
-    if (Model == "常开")
-      digitalWrite(FAN, 1);
-    ticker.detach();
-    ticker.attach(1, control_temperature);
-    Model = "自动";
-  }
-  Serial.println("模式: " + String(status));
-  fanStatus = digitalRead(FAN);
-}
-
 //自动模式
-void control_temperature()
+void control_temperature(bool flag)
 {
   static int time_flag = 0;
   time_flag++;
 
-  if (temperature.toDouble() > max_t)
+  if (msg.temperature.toFloat() > msg.max_t)
   {
     digitalWrite(FAN, 0);
     time_flag = 0;
@@ -148,12 +116,54 @@ void control_temperature()
   else
   {
     if (digitalRead(FAN))
-      if (time_flag >= 15)
+      // 控制台的调用那么无视三十秒
+      if (time_flag >= 15 || flag == true)
       { // 保持30秒再关
         time_flag = 0;
         digitalWrite(FAN, 1);
       }
   }
+}
+
+void Receive()
+{
+  String status = server.arg("status");
+  double tmp = server.arg("max_t").toFloat();
+
+  if (tmp != 0.00)
+  {
+    msg.max_t = tmp;
+  }
+
+  Serial.println("最大温度：" + String(msg.max_t));
+
+  if (status == "open")
+  {
+    ticker.detach();
+    digitalWrite(FAN, 0);
+    msg.model = "常开";
+  }
+  else if (status == "close")
+  {
+    ticker.detach();
+    digitalWrite(FAN, 1);
+    msg.model = "关闭";
+  }
+  else if (status == "auto")
+  {
+    // 如果刚才是开着的先关掉
+    if (msg.model == "常开")
+      digitalWrite(FAN, 1);
+    ticker.detach();
+    ticker.attach(1, control_temperature, false);
+    msg.model = "自动";
+  }
+  Serial.println("模式: " + String(status));
+  msg.status = digitalRead(FAN);
+
+  control_temperature(true);
+  
+  server.send(200);
 }
 
 void handleTheClient()
@@ -210,20 +220,20 @@ bool handleFileRead(String path)
 /*
 var data = {
     temperature: '0',
-    Model: '0',
-    Temperature_MAX: '0',
-    fanStatus: '0',
+    model: '0',
+    max_t: '0',
+    status: '0',
     Humidity: '0'
 };
 */
 String getJsonData()
 {
   String json = "{";
-  json += "\"temperature\":\"" + String(temperature) + "\",";
-  json += "\"Model\":\"" + String(Model) + "\",";
-  json += "\"Temperature_MAX\":\"" + String(max_t) + "\",";
-  json += "\"fanStatus\":\"" + String(digitalRead(FAN) ? "关闭" : "开启") + "\",";
-  json += "\"Humidity\":\"" + String(DHT.humidity)+ "\"";
+  json += "\"temperature\":\"" + String(msg.temperature) + "\",";
+  json += "\"model\":\"" + String(msg.model) + "\",";
+  json += "\"max_t\":\"" + String(msg.max_t) + "\",";
+  json += "\"status\":\"" + String(digitalRead(FAN) ? "关闭" : "开启") + "\",";
+  json += "\"Humidity\":\"" + String(DHT.humidity) + "\"";
   json += "}";
   return json;
 }

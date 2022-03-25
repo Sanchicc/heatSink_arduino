@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="css/theme.css">
 </head>
 
-<body onmousedown="decorator_down()">
+<body>
     <div id="button_div">
         <div id="padding_div">
             <table class="tables">
@@ -19,11 +19,11 @@
                 </tr>
                 <tr>
                     <td>状态：</td>
-                    <td> <span id="fanStatus">正在读取</span></td>
+                    <td> <span id="status">正在读取</span></td>
                 </tr>
             </table>
 
-            <form action="fan" method="post">
+            <form>
                 <p>
                     <span id="setText">设定最大温度：</span>
                     <input type="range" value="40" max="70" min="0" name="max_t" id="setMaxT"
@@ -32,7 +32,7 @@
                 </p>
 
                 <div id="radio_list">
-                    <P onmousedown="postCurrentValue()">
+                    <P onchange="postCurrentValue()">
                         <span class="radio">常开<input type="radio" value="open" name="status"></span>
                         <span class="radio">自动<input type="radio" value="auto" name="status" checked></span>
                         <span class="radio">关闭<input type="radio" value="close" name="status"></span>
